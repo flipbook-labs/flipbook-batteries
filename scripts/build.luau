@@ -21,7 +21,10 @@ local EXCLUDED_PATHS = {
 	"%.spec%.luau",
 }
 
-local PROJECT_BUILD_PATH = `{project.BUILD_PATH}/flipbook-batteries`
+local PROJECT_NAME = "flipbook-batteries"
+local ARCHIVE_NAME = `{PROJECT_NAME}.zip`
+
+local PROJECT_BUILD_PATH = `{project.BUILD_PATH}/{PROJECT_NAME}`
 
 local elapsed = stopwatch(function()
 	log.info(`building project to {PROJECT_BUILD_PATH}...`)
@@ -43,6 +46,11 @@ local elapsed = stopwatch(function()
 			fs.remove(match)
 		end
 	end
+
+	run("zip", { "-r", ARCHIVE_NAME, PROJECT_NAME }, {
+		cwd = project.BUILD_PATH,
+		stdio = "default",
+	})
 end)
 
 log.info(`successfully built flipbook-batteries in {elapsed}ms`)

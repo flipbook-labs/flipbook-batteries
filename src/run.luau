@@ -9,10 +9,9 @@ type Options = {
 
 local function run(program: string, params: { string }, options: Options?): string
 	local command = `{program} {table.concat(params, " ")}`
-	print(richterm.bold(`> {command}`))
+	print(richterm.dim(`> {command}`))
 
 	local result = process.system(command, {
-		shell = true,
 		stdio = if options and options.stdio then options.stdio else "inherit",
 		cwd = if options then options.cwd else nil,
 		env = if options then options.env else nil,
