@@ -2,7 +2,8 @@ local fs = require("@lute/fs")
 local process = require("@lute/process")
 local task = require("@lute/task")
 
-local findWhere = require("./findWhere")
+local findWhere = require("@root/findWhere")
+local richterm = require("@pkg/batteries/richterm")
 
 type Options = {
 	roots: { string },
@@ -32,9 +33,8 @@ local function watch(options: Options)
 	end)
 
 	print("watching folders:")
-	-- stdio.write(stdio.style("dim"))
 	for _, watchedFolder in foldersToWatch do
-		print(`> {watchedFolder}`)
+		print(richterm.dim(`> {watchedFolder}`))
 
 		task.spawn(function()
 			fs.watch(watchedFolder, function(filename)
@@ -44,7 +44,6 @@ local function watch(options: Options)
 			end)
 		end)
 	end
-	-- stdio.write(stdio.style("reset"))
 	print("listening for file changes...")
 
 	task.wait(math.huge)

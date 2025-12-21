@@ -1,8 +1,10 @@
 local process = require("@lute/process")
 
+local log = require("@scripts/lib/log")
 local mkdir = require("@root/mkdir")
 local project = require("@repo/project")
 local rmdir = require("@root/rmdir")
+local stopwatch = require("@scripts/lib/stopwatch")
 
 local function installLuteBatteries()
 	rmdir(project.LUTE_BATTERIES_PATH)
@@ -20,7 +22,13 @@ local function installLuteBatteries()
 	end
 end
 
-local res = process.run({ "lute", "setup" })
-assert(res.ok, res.stderr)
+local elapsed = stopwatch(function()
+	log.info("setting up Lute typedefs...")
+	local res = process.run({ "lute", "setup" })
+	assert(res.ok, res.stderr)
 
-installLuteBatteries()
+	log.info("installing Lute batteries...")
+	installLuteBatteries()
+end)
+
+log.info(`successfully installed dependencies in {elapsed}ms`)

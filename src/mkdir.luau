@@ -13,7 +13,6 @@ local function mkdir(dirPath: string)
 		end
 
 		if not fs.exists(dir) then
-			print("mkdir", current)
 			fs.mkdir(current)
 		end
 	end

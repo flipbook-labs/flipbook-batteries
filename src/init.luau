@@ -10,4 +10,7 @@ return {
 	mkdir = require("@self/mkdir"),
 	rmdir = require("@self/rmdir"),
 	watch = require("@self/watch"),
+
+	-- Logging
+	createLogger = require("@self/createLogger"),
 }

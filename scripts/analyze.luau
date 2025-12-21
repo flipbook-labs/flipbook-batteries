@@ -1,5 +1,6 @@
 local process = require("@lute/process")
 
+local log = require("@scripts/lib/log")
 local project = require("@repo/project")
 local run = require("@root/run")
 
@@ -13,14 +14,17 @@ local function catchFailure(job: string, callback: () -> ())
 	end
 end
 
+log.info("linting with Selene...")
 catchFailure("selene", function()
 	run("selene", { table.unpack(project.FOLDERS_TO_LINT) })
 end)
 
+log.info("checking formatting with Stylua...")
 catchFailure("stylua", function()
 	run("stylua", { "--check", table.unpack(project.FOLDERS_TO_LINT) })
 end)
 
+log.info("analyzing Luau source...")
 catchFailure("luau-lsp", function()
 	run("luau-lsp", {
 		"analyze",
@@ -39,7 +43,6 @@ if #failures > 0 then
 		failedJobs = failures[1]
 	end
 
-	print(`one or more analysis steps failed: {failedJobs}`)
-
+	log.err(`one or more analysis steps failed: {failedJobs}`)
 	process.exit(1)
 end
