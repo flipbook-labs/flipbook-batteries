@@ -6,7 +6,7 @@ local mkdir = require("@root/mkdir")
 local project = require("@repo/project")
 local rmdir = require("@root/rmdir")
 local run = require("@root/run")
-local stopwatch = require("@scripts/lib/stopwatch")
+local stopwatch = require("@root/stopwatch")
 
 local INCLUDED_PATHS = {
 	"pkg/",

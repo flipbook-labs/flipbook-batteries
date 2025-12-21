@@ -13,4 +13,7 @@ return {
 
 	-- Logging
 	createLogger = require("@self/createLogger"),
+
+	-- Benchmarking
+	stopwatch = require("@self/stopwatch"),
 }
