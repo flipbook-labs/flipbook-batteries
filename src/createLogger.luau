@@ -11,7 +11,7 @@ local LOG_LEVEL_ORDER = {
 }
 
 type Logger = {
-	getLogLevel: () -> (),
+	getLogLevel: () -> LogLevel,
 	info: (...any) -> (),
 	debug: (...any) -> (),
 	warn: (...any) -> (),
