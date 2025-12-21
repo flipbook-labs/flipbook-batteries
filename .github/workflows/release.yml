@@ -12,6 +12,8 @@ jobs:
   build-standalone-zip:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
     env:
       BUILD_ARTIFACT_PATH: build/flipbook-batteries.zip
     steps:
