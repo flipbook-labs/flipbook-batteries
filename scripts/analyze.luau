@@ -1,3 +1,4 @@
+local cli = require("@pkg/batteries/cli")
 local process = require("@lute/process")
 
 local log = require("@scripts/lib/log")
@@ -6,6 +7,14 @@ local run = require("@root/run")
 local stopwatch = require("@root/stopwatch")
 
 local failures: { string } = {}
+
+local args = cli.parser()
+
+args:add("include-build", "flag", {
+	help = "Includes the build in analysis",
+})
+
+args:parse({ ... })
 
 local function catchFailure(job: string, callback: () -> ())
 	local ok = pcall(callback)
@@ -35,6 +44,17 @@ local elapsed = stopwatch(function()
 			"scripts",
 		})
 	end)
+
+	if args:has("include-build") then
+		log.info("analyzing built source...")
+		catchFailure("luau-lsp", function()
+			run("luau-lsp", {
+				"analyze",
+				"--settings=./.vscode/settings.json",
+				project.BUILD_PATH,
+			})
+		end)
+	end
 
 	if #failures > 0 then
 		local failedJobs
