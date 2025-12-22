@@ -4,6 +4,7 @@ return {
 	run = require("@self/run"),
 
 	-- Filesystem
+	copyInto = require("@self/copyInto"),
 	find = require("@self/find"),
 	findAndReplace = require("@self/findAndReplace"),
 	findWhere = require("@self/findWhere"),
