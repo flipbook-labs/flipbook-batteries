@@ -1,12 +1,20 @@
 local fs = require("@lute/fs")
 local process = require("@lute/process")
 
+local function normalize(path: string)
+	return path:gsub("/+", "/")
+end
+
+local function pathJoin(a: string, b: string)
+	return normalize(`{a}/{b}`)
+end
+
 local function startsWith(str: string, prefix: string)
 	return str:sub(1, #prefix) == prefix
 end
 
 local function mkdir(dirPath: string)
-	dirPath = dirPath:gsub("/+", "/")
+	dirPath = normalize(dirPath)
 
 	local current = if startsWith(dirPath, "/") then "/" else process.cwd()
 
@@ -16,7 +24,7 @@ local function mkdir(dirPath: string)
 		end
 
 		if current then
-			current ..= `{dir}/`
+			current = pathJoin(current, dir)
 		else
 			current = dir
 		end
