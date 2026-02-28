@@ -1,9 +1,9 @@
 local fs = require("@lute/fs")
 local process = require("@lute/process")
-local richterm = require("@pkg/batteries/richterm")
 local task = require("@lute/task")
 
 local findWhere = require("@root/findWhere")
+local richterm = require("@scripts/batteries/richterm")
 
 type Options = {
 	roots: { string },
