@@ -3,7 +3,7 @@ local process = require("@std/process")
 local task = require("@lute/task")
 
 local findWhere = require("@root/findWhere")
-local richterm = require("@scripts/batteries/richterm")
+local richterm = require("@root/batteries/richterm")
 
 type Options = {
 	roots: { string },

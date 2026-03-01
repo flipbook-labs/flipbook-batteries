@@ -1,5 +1,5 @@
 local process = require("@std/process")
-local richterm = require("@scripts/batteries/richterm")
+local richterm = require("@root/batteries/richterm")
 
 type Options = {
 	cwd: string?,
