@@ -17,9 +17,6 @@ jobs:
         with:
           version: v1.2.0
 
-      - name: Install dependencies
-        run: lute scripts/install.luau
-
       - name: Build the project
         run: lute scripts/build.luau
 
@@ -36,8 +33,8 @@ jobs:
         with:
           version: v1.2.0
 
-      - name: Install dependencies
-        run: lute scripts/install.luau
+      - name: Setup Lute typedefs
+        run: lute setup
 
       - name: Run analysis
         run: lute scripts/analyze.luau
@@ -51,9 +48,6 @@ jobs:
       - uses: CompeyDev/setup-rokit@v0.1.2
         with:
           version: v1.2.0
-
-      - name: Install dependencies
-        run: lute scripts/install.luau
 
       - name: Run tests
         run: lute scripts/test.luau
