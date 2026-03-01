@@ -1,6 +1,6 @@
-local cli = require("@pkg/batteries/cli")
-local process = require("@lute/process")
+local process = require("@std/process")
 
+local cli = require("@scripts/lib/cli")
 local log = require("@scripts/lib/log")
 local project = require("@repo/project")
 local run = require("@root/run")
