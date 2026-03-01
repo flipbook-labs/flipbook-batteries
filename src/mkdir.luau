@@ -1,38 +1,14 @@
-local fs = require("@lute/fs")
-local process = require("@lute/process")
+local fs = require("@std/fs")
+local path = require("@std/path")
 
-local function normalize(path: string)
-	return path:gsub("/+", "/")
-end
-
-local function pathJoin(a: string, b: string)
-	return normalize(`{a}/{b}`)
-end
-
-local function startsWith(str: string, prefix: string)
-	return str:sub(1, #prefix) == prefix
-end
-
-local function mkdir(dirPath: string)
-	dirPath = normalize(dirPath)
-
-	local current = if startsWith(dirPath, "/") then "/" else process.cwd()
-
-	for _, dir in dirPath:split("/") do
-		if dir == "" then
-			continue
-		end
-
-		if current then
-			current = pathJoin(current, dir)
-		else
-			current = dir
-		end
-
-		if not fs.exists(current) then
-			fs.mkdir(current)
-		end
-	end
+--[[
+	DEPRECATED: Use fs.createdirectory from @std with the `makeparents` option
+	instead
+]]
+local function mkdir(dirPath: path.pathlike)
+	fs.createdirectory(dirPath, {
+		makeparents = true,
+	})
 end
 
 return mkdir

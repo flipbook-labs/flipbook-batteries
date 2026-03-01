@@ -1,4 +1,4 @@
-local process = require("@lute/process")
+local process = require("@std/process")
 
 local cli = require("@scripts/batteries/cli")
 local log = require("@scripts/lib/log")

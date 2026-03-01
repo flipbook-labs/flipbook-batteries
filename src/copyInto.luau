@@ -1,16 +1,15 @@
-local fs = require("@lute/fs")
+local fs = require("@std/fs")
+local path = require("@std/path")
 
-local mkdir = require("@root/mkdir")
-
-local function copyInto(src: string, dest: string)
+local function copyInto(src: path.pathlike, dest: path.pathlike)
 	if fs.type(src) == "dir" then
-		if not fs.exists(dest) then
-			mkdir(dest)
-		end
+		fs.createdirectory(dest, {
+			makeparents = true,
+		})
 
-		for _, file in fs.listdir(src) do
-			local filePath = `{src}/{file.name}`
-			local fileDest = `{dest}/{file.name}`
+		for _, file in fs.listdirectory(src) do
+			local filePath = path.join(src, file.name)
+			local fileDest = path.join(dest, file.name)
 
 			if file.type == "dir" then
 				copyInto(filePath, fileDest)
