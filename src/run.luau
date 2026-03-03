@@ -5,7 +5,7 @@ local richterm = require("@root/batteries/richterm")
 type Options = {
 	cwd: string?,
 	env: { [string]: string }?,
-	display: boolean,
+	display: boolean?,
 
 	--- @DEPRECATED: Use `display` instead
 	stdio: any,

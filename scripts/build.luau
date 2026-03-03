@@ -38,9 +38,7 @@ local elapsed = stopwatch(function()
 		local includedPath = path.resolve(includedPathStr)
 		local destPath = path.join(PROJECT_BUILD_PATH, includedPathStr)
 
-		run("cp", { "-R", tostring(includedPath), tostring(destPath) }, {
-			stdio = "default",
-		})
+		run("cp", { "-R", tostring(includedPath), tostring(destPath) })
 	end
 
 	log.info(`pruning development files from build...`)
@@ -54,7 +52,6 @@ local elapsed = stopwatch(function()
 
 	run("zip", { "-r", ARCHIVE_NAME, PROJECT_NAME }, {
 		cwd = project.BUILD_PATH,
-		stdio = "default",
 	})
 end)
 
