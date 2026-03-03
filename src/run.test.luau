@@ -1,6 +1,7 @@
 local expect = require("@std/test/assert")
 local fs = require("@std/fs")
 local path = require("@std/path")
+local process = require("@std/process")
 local system = require("@lute/system")
 local test = require("@std/test")
 
@@ -16,10 +17,7 @@ test.case("works with path objects", function()
 end)
 
 test.case("go crazy with it", function()
-	local tempFile = path.join(system.tmpdir(), "message.txt")
-	fs.writestringtofile(tempFile, "Hello World")
+	local res = run("echo", { "Hello", 123, true, process.cwd() })
 
-	local res = run("echo", { "Hello", 123, true })
-
-	expect.eq(res, "Hello 123 true")
+	expect.eq(res, `Hello 123 true {process.cwd()}`)
 end)

@@ -17,9 +17,13 @@ args:add("include-build", "flag", {
 args:parse({ ... })
 
 local function catchFailure(job: string, callback: () -> ())
-	local ok = pcall(callback)
+	local ok, err = pcall(function()
+		callback()
+		return nil
+	end)
 
 	if not ok then
+		print(err)
 		table.insert(failures, job)
 	end
 end
