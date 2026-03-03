@@ -27,7 +27,7 @@ local function run(program: string, params: { string | number | boolean | path.p
 
 	local result = process.run(command, {
 		stdio = "default",
-		cwd = if options then tostring(options.cwd) else nil,
+		cwd = if options and options.cwd then tostring(options.cwd) else nil,
 		env = if options then options.env else nil,
 	})
 
