@@ -3,7 +3,7 @@ local process = require("@std/process")
 local richterm = require("@root/batteries/richterm")
 
 type Options = {
-	cwd: string?,
+	cwd: path.pathlike?,
 	env: { [string]: string }?,
 	display: boolean?,
 
@@ -27,7 +27,7 @@ local function run(program: string, params: { string | number | boolean | path.p
 
 	local result = process.run(command, {
 		stdio = "default",
-		cwd = if options then options.cwd else nil,
+		cwd = if options then tostring(options.cwd) else nil,
 		env = if options then options.env else nil,
 	})
 
