@@ -37,7 +37,7 @@ local function run(program: string, params: { string | number | boolean | path.p
 	if result.ok then
 		local trimmed = result.stdout:gsub("^\n", ""):gsub("\n$", "")
 
-		if shouldDisplay then
+		if shouldDisplay and trimmed ~= "" then
 			print(trimmed)
 		end
 
