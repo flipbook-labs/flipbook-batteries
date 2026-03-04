@@ -34,14 +34,13 @@ local function run(program: string, params: { string | number | boolean | path.p
 		env = if options then options.env else nil,
 	})
 
+	local stdout = result.stdout:gsub("^\n", ""):gsub("\n$", "")
+	if shouldDisplay and stdout ~= "" then
+		print(stdout)
+	end
+
 	if result.ok then
-		local trimmed = result.stdout:gsub("^\n", ""):gsub("\n$", "")
-
-		if shouldDisplay and trimmed ~= "" then
-			print(trimmed)
-		end
-
-		return trimmed
+		return stdout
 	else
 		error(result.stderr, 2)
 	end
