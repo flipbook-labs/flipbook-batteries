@@ -29,7 +29,7 @@ local function run(program: string, params: { string | number | boolean | path.p
 	end
 
 	local result = process.system(command, {
-		stdio = if options and options.stdio then options.stdio else "inherit",
+		stdio = if options and options.stdio then options.stdio else "default",
 		cwd = if options and options.cwd then tostring(options.cwd) else nil,
 		env = if options then options.env else nil,
 	})
