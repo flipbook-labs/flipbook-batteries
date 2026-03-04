@@ -22,11 +22,14 @@ local function run(program: string, params: { string | number | boolean | path.p
 		shouldDisplay = true
 	end
 
-	local command = { program, table.unpack(stringParams) }
-	print(richterm.dim(`> {table.concat(command, " ")}`))
+	local command = `{program} {table.concat(stringParams, " ")}`
 
-	local result = process.run(command, {
-		stdio = "default",
+	if shouldDisplay then
+		print(richterm.dim(`> {command}`))
+	end
+
+	local result = process.system(command, {
+		stdio = if options and options.stdio then options.stdio else "inherit",
 		cwd = if options and options.cwd then tostring(options.cwd) else nil,
 		env = if options then options.env else nil,
 	})
