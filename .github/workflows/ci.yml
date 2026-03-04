@@ -53,4 +53,4 @@ jobs:
           version: v1.2.0
 
       - name: Run tests
-        run: lute scripts/test.luau
+        run: lute test src/

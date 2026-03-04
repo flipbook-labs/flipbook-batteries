@@ -39,7 +39,7 @@ local elapsed = stopwatch(function()
 		local destPath = path.join(PROJECT_BUILD_PATH, includedPathStr)
 
 		run("cp", { "-R", tostring(includedPath), tostring(destPath) }, {
-			stdio = "default",
+			display = true,
 		})
 	end
 
@@ -54,7 +54,7 @@ local elapsed = stopwatch(function()
 
 	run("zip", { "-r", ARCHIVE_NAME, PROJECT_NAME }, {
 		cwd = project.BUILD_PATH,
-		stdio = "default",
+		display = true,
 	})
 end)
 
