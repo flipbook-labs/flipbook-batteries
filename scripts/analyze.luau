@@ -1,6 +1,6 @@
-local cli = require("@pkg/batteries/cli")
-local process = require("@lute/process")
+local process = require("@std/process")
 
+local cli = require("@scripts/lib/cli")
 local log = require("@scripts/lib/log")
 local project = require("@repo/project")
 local run = require("@root/run")
@@ -17,9 +17,13 @@ args:add("include-build", "flag", {
 args:parse({ ... })
 
 local function catchFailure(job: string, callback: () -> ())
-	local ok = pcall(callback)
+	local ok, err = pcall(function()
+		callback()
+		return nil
+	end)
 
 	if not ok then
+		print(err)
 		table.insert(failures, job)
 	end
 end
@@ -27,12 +31,16 @@ end
 local elapsed = stopwatch(function()
 	log.info("linting with Selene...")
 	catchFailure("selene", function()
-		run("selene", { table.unpack(project.FOLDERS_TO_LINT) })
+		run("selene", { table.unpack(project.FOLDERS_TO_LINT) }, {
+			display = true,
+		})
 	end)
 
 	log.info("checking formatting with Stylua...")
 	catchFailure("stylua", function()
-		run("stylua", { "--check", table.unpack(project.FOLDERS_TO_LINT) })
+		run("stylua", { "--check", table.unpack(project.FOLDERS_TO_LINT) }, {
+			display = true,
+		})
 	end)
 
 	log.info("analyzing Luau source...")
@@ -42,6 +50,8 @@ local elapsed = stopwatch(function()
 			"--settings=./.vscode/settings.json",
 			"src",
 			"scripts",
+		}, {
+			display = true,
 		})
 	end)
 
@@ -52,6 +62,8 @@ local elapsed = stopwatch(function()
 				"analyze",
 				"--settings=./.vscode/settings.json",
 				project.BUILD_PATH,
+			}, {
+				display = true,
 			})
 		end)
 	end

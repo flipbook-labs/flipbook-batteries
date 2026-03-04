@@ -1,9 +1,9 @@
-local fs = require("@lute/fs")
-local process = require("@lute/process")
-local richterm = require("@pkg/batteries/richterm")
+local fs = require("@std/fs")
+local process = require("@std/process")
 local task = require("@lute/task")
 
 local findWhere = require("@root/findWhere")
+local richterm = require("@root/batteries/richterm")
 
 type Options = {
 	roots: { string },
@@ -16,14 +16,14 @@ local function watch(options: Options)
 		if fs.type(path) == "dir" then
 			if options.excludedFilePatterns then
 				for _, excludedFilePattern in options.excludedFilePatterns do
-					if path:match(excludedFilePattern) then
+					if tostring(path):match(excludedFilePattern) then
 						return nil
 					end
 				end
 			end
 
 			for _, root in options.roots do
-				if path:match(root) then
+				if tostring(path):match(root) then
 					return true
 				end
 			end

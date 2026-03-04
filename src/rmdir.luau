@@ -1,18 +1,13 @@
-local fs = require("@lute/fs")
+local fs = require("@std/fs")
 
+--[[
+	DEPRECATED: Use fs.removedirectory from @std with the`recursive` option
+	instead
+]]
 local function rmdir(filePath: string)
-	if not fs.exists(filePath) then
-		return
-	end
-
-	if fs.type(filePath) == "dir" then
-		for _, child in fs.listdir(filePath) do
-			rmdir(`{filePath}/{child.name}`)
-		end
-		fs.rmdir(filePath)
-	else
-		fs.remove(filePath)
-	end
+	fs.removedirectory(filePath, {
+		recursive = true,
+	})
 end
 
 return rmdir

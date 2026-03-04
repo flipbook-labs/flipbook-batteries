@@ -1,15 +1,13 @@
-local fs = require("@lute/fs")
+local fs = require("@std/fs")
+local path = require("@std/path")
 
 local find = require("@root/find")
 local log = require("@scripts/lib/log")
-local mkdir = require("@root/mkdir")
 local project = require("@repo/project")
-local rmdir = require("@root/rmdir")
 local run = require("@root/run")
 local stopwatch = require("@root/stopwatch")
 
 local INCLUDED_PATHS = {
-	"pkg/",
 	"src/",
 	".luaurc",
 	"init.luau",
@@ -28,13 +26,20 @@ local PROJECT_BUILD_PATH = `{project.BUILD_PATH}/{PROJECT_NAME}`
 
 local elapsed = stopwatch(function()
 	log.info(`building project to {PROJECT_BUILD_PATH}...`)
-	rmdir(PROJECT_BUILD_PATH)
-	mkdir(PROJECT_BUILD_PATH)
+	fs.removedirectory(PROJECT_BUILD_PATH, {
+		recursive = true,
+	})
+	fs.createdirectory(PROJECT_BUILD_PATH, {
+		makeparents = true,
+	})
 
 	log.info(`copying source files...`)
-	for _, includedPath in INCLUDED_PATHS do
-		run("cp", { "-R", includedPath, `{PROJECT_BUILD_PATH}/{includedPath}` }, {
-			stdio = "default",
+	for _, includedPathStr in INCLUDED_PATHS do
+		local includedPath = path.resolve(includedPathStr)
+		local destPath = path.join(PROJECT_BUILD_PATH, includedPathStr)
+
+		run("cp", { "-R", tostring(includedPath), tostring(destPath) }, {
+			display = true,
 		})
 	end
 
@@ -49,7 +54,7 @@ local elapsed = stopwatch(function()
 
 	run("zip", { "-r", ARCHIVE_NAME, PROJECT_NAME }, {
 		cwd = project.BUILD_PATH,
-		stdio = "default",
+		display = true,
 	})
 end)
 
