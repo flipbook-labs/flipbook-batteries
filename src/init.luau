@@ -17,4 +17,7 @@ return {
 
 	-- Benchmarking
 	stopwatch = require("@self/stopwatch"),
+
+	-- Luau Execution
+	executeLuauTaskAsync = require("@self/luau-execution/executeLuauTaskAsync"),
 }
