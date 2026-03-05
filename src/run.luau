@@ -5,43 +5,56 @@ local richterm = require("@root/batteries/richterm")
 type Options = {
 	cwd: path.pathlike?,
 	env: { [string]: string }?,
-	stdio: ("default" | "inherit" | "none")?,
+	captureOutput: boolean?,
+
+	-- @DEPRECATED: Use `captureOutput` instead.
+	stdio: any,
 }
 
--- By default this function will return nil, but in the case where you want to
--- capture stdout you can set `stdio = "default"`. The reason you have to opt-in
--- to this is because Lute doesn't offer a "stream to terminal output but also
--- propagate stdout when done" option. You can have one or the other.
+--[[
+	By default this function will return nil, but in the case where you want to
+	capture stdout for parsing you can set `captureOutput = true`.
+--]]
 local function run(program: string, params: { string | number | boolean | path.pathlike }, options: Options?): string?
 	local stringParams: { string } = {}
 	for _, param in params do
 		table.insert(stringParams, tostring(param))
 	end
 
+	local captureOutput = if options and options.captureOutput then options.captureOutput else false
+
 	local command = `{program} {table.concat(stringParams, " ")}`
 	print(richterm.dim(`> {command}`))
 
-	local processSystemOptions: process.processsystemoptions = {
-		stdio = if options and options.stdio then options.stdio else "inherit",
+	local stdio = "inherit"
+	if options then
+		if options.captureOutput then
+			stdio = "default"
+		elseif options.stdio then
+			stdio = options.stdio
+		end
+	end
+
+	local result = process.system(command, {
+		stdio = stdio,
 		cwd = if options and options.cwd then tostring(options.cwd) else nil,
 		env = if options then options.env else nil,
-	}
-
-	local result = process.system(command, processSystemOptions)
+	})
 
 	if result.ok then
-		if processSystemOptions.stdio ~= "inherit" then
-			local stdout = result.stdout:gsub("^\n", ""):gsub("\n$", "")
+		local stdout = result.stdout:gsub("^\n", ""):gsub("\n$", "")
 
+		-- Lute only supports capturing stdout when `stdio = "default"`, and
+		-- this case also means that Lute won't stream the output to the
+		-- terminal itself. So we do it manually to improve the ergonomics.
+		if captureOutput then
 			print(stdout)
-
-			return if stdout ~= "" then stdout else nil
 		end
+
+		return stdout
 	else
 		error(result.stderr, 2)
 	end
-
-	return nil
 end
 
 return run
