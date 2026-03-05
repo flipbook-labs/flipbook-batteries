@@ -5,43 +5,53 @@ local richterm = require("@root/batteries/richterm")
 type Options = {
 	cwd: path.pathlike?,
 	env: { [string]: string }?,
-	display: boolean?,
+	captureOutput: boolean?,
 
-	--- @DEPRECATED: Use `display` instead
+	-- @DEPRECATED: Use `captureOutput` instead.
 	stdio: any,
 }
 
-local function run(program: string, params: { string | number | boolean | path.pathlike }, options: Options?): string
+--[[
+	By default this function will return nil, but in the case where you want to
+	capture stdout for parsing you can set `captureOutput = true`.
+--]]
+local function run(program: string, params: { string | number | boolean | path.pathlike }, options: Options?): string?
 	local stringParams: { string } = {}
 	for _, param in params do
 		table.insert(stringParams, tostring(param))
 	end
 
-	local shouldDisplay = false
-	if options and (options.display or options.stdio == "inherit") then
-		shouldDisplay = true
-	end
+	local captureOutput = if options and options.captureOutput then options.captureOutput else false
 
 	local command = `{program} {table.concat(stringParams, " ")}`
+	print(richterm.dim(`> {command}`))
 
-	if shouldDisplay then
-		print(richterm.dim(`> {command}`))
+	local stdio = "inherit"
+	if options then
+		if options.captureOutput then
+			stdio = "default"
+		elseif options.stdio then
+			stdio = options.stdio
+		end
 	end
 
 	local result = process.system(command, {
-		stdio = if options and options.stdio then options.stdio else "default",
+		stdio = stdio,
 		cwd = if options and options.cwd then tostring(options.cwd) else nil,
 		env = if options then options.env else nil,
 	})
 
 	if result.ok then
-		local trimmed = result.stdout:gsub("^\n", ""):gsub("\n$", "")
+		local stdout = result.stdout:gsub("^\n", ""):gsub("\n$", "")
 
-		if shouldDisplay and trimmed ~= "" then
-			print(trimmed)
+		-- Lute only supports capturing stdout when `stdio = "default"`, and
+		-- this case also means that Lute won't stream the output to the
+		-- terminal itself. So we do it manually to improve the ergonomics.
+		if captureOutput then
+			print(stdout)
 		end
 
-		return trimmed
+		return stdout
 	else
 		error(result.stderr, 2)
 	end
