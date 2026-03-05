@@ -12,7 +12,7 @@ test.case("works with path objects", function()
 	fs.writestringtofile(tempFile, "Hello World")
 
 	local res = run("cat", { tempFile }, {
-		stdio = "default",
+		captureOutput = true,
 	})
 
 	expect.eq(res, "Hello World")
@@ -20,7 +20,7 @@ end)
 
 test.case("go crazy with it", function()
 	local res = run("echo", { "Hello", 123, true, process.cwd() }, {
-		stdio = "default",
+		captureOutput = true,
 	})
 
 	expect.eq(res, `Hello 123 true {process.cwd()}`)
