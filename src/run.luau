@@ -5,7 +5,7 @@ local richterm = require("@root/batteries/richterm")
 type Options = {
 	cwd: path.pathlike?,
 	env: { [string]: string }?,
-	stdio: "default" | "inherit" | "none",
+	stdio: ("default" | "inherit" | "none")?,
 }
 
 -- By default this function will return nil, but in the case where you want to
