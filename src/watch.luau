@@ -1,60 +1,71 @@
 local fs = require("@std/fs")
-local process = require("@std/process")
+local path = require("@std/path")
 local task = require("@lute/task")
 
-local findWhere = require("@root/findWhere")
+local getDescendants = require("@root/getDescendants")
 local richterm = require("@root/batteries/richterm")
 
 type Options = {
-	roots: { string },
+	roots: { path.pathlike },
 	excludedFilePatterns: { string }?,
-	onChanged: ((filePath: string) -> ())?,
+	onChanged: ((filePath: path.path) -> ())?,
 }
 
-local function watch(options: Options)
-	local foldersToWatch = findWhere(process.cwd(), function(path): boolean?
-		if fs.type(path) == "dir" then
-			if options.excludedFilePatterns then
-				for _, excludedFilePattern in options.excludedFilePatterns do
-					if tostring(path):match(excludedFilePattern) then
-						return nil
+local function getWatchedFolders(options: Options)
+	local watchedFolders = {}
+
+	for _, root in options.roots do
+		for _, descendantPath in getDescendants(root) do
+			if fs.type(descendantPath) == "dir" then
+				local isIncluded = true
+
+				if options.excludedFilePatterns then
+					for _, excludedFilePattern in options.excludedFilePatterns do
+						if tostring(descendantPath):match(excludedFilePattern) then
+							isIncluded = false
+							break
+						end
 					end
 				end
-			end
 
-			for _, root in options.roots do
-				if tostring(path):match(root) then
-					return true
+				if isIncluded and tostring(descendantPath):match(tostring(root)) then
+					table.insert(watchedFolders, descendantPath)
 				end
 			end
 		end
+	end
 
-		return false
-	end)
+	return watchedFolders
+end
 
-	-- This keeps all of the WatchHandles in memory. Without this, `fs.watch`
-	-- only works once
-	local watchHandles = {}
+local function watch(options: Options)
+	local watchers = {}
+	local watcherToFolderMap = {}
+
+	local watchedFolders = getWatchedFolders(options)
 
 	print(richterm.dim("watching folders:"))
-	for _, watchedFolder in foldersToWatch do
+	for _, watchedFolder in watchedFolders do
 		print(richterm.dim(`> {watchedFolder}`))
 
-		table.insert(
-			watchHandles,
-			fs.watch(watchedFolder, function(filename, watchEvent)
-				if watchEvent.change and options.onChanged then
-					local filePath = `{watchedFolder}/{filename}`
-					options.onChanged(filePath)
-				end
-			end)
-		)
+		local watcher = fs.watch(watchedFolder)
+
+		watcherToFolderMap[watcher] = watchedFolder
+		table.insert(watchers, watcher)
 	end
 	print("listening for file changes...")
 
-	task.wait(math.huge)
+	while true do
+		for _, watcher in watchers do
+			local event = watcher:next()
+			local watchedFolder = watcherToFolderMap[watcher]
 
-	return watchHandles
+			if event and event.change and options.onChanged then
+				options.onChanged(watchedFolder)
+			end
+		end
+		task.wait(0.01)
+	end
 end
 
 return watch
