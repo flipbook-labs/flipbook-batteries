@@ -30,7 +30,7 @@ local elapsed = stopwatch(function()
 		recursive = true,
 	})
 	fs.createDirectory(PROJECT_BUILD_PATH, {
-		makeparents = true,
+		makeParents = true,
 	})
 
 	log.info(`copying source files...`)

@@ -4,7 +4,7 @@ local path = require("@std/path")
 local function copyInto(src: path.Pathlike, dest: path.Pathlike)
 	if fs.type(src) == "dir" then
 		fs.createDirectory(dest, {
-			makeparents = true,
+			makeParents = true,
 		})
 
 		for _, file in fs.listDirectory(src) do
