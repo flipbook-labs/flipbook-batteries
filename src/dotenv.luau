@@ -8,11 +8,11 @@ local function dotenv()
 	local current = process.cwd()
 	local env: { [string]: string } = {}
 
-	for _, file in fs.listdirectory(current) do
+	for _, file in fs.listDirectory(current) do
 		local filePath = path.join(current, file.name)
 
 		if file.name == DOTENV_FILE_NAME then
-			local content = fs.readfiletostring(filePath)
+			local content = fs.readFileToString(filePath)
 
 			for line in content:gmatch("[^\r\n]+") do
 				if line:match("^%s*#%s*") then
