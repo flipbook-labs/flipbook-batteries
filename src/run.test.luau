@@ -9,7 +9,7 @@ local run = require("./run")
 
 test.case("works with path objects", function()
 	local tempFile = path.join(system.tmpdir(), "message.txt")
-	fs.writestringtofile(tempFile, "Hello World")
+	fs.writeStringToFile(tempFile, "Hello World")
 
 	local res = run("cat", { tempFile }, {
 		captureOutput = true,

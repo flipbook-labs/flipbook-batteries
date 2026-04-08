@@ -6,9 +6,9 @@ local getDescendants = require("@root/getDescendants")
 local richterm = require("@root/batteries/richterm")
 
 type Options = {
-	roots: { path.pathlike },
+	roots: { path.Pathlike },
 	excludedFilePatterns: { string }?,
-	onChanged: ((filePath: path.path) -> ())?,
+	onChanged: ((filePath: path.Path) -> ())?,
 }
 
 local function getWatchedFolders(options: Options)

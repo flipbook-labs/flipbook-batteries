@@ -1,12 +1,12 @@
 local fs = require("@std/fs")
 local path = require("@std/path")
 
-local function findWhere(rootDirPath: path.pathlike, matcher: (path: path.pathlike) -> boolean?): { path.path }
+local function findWhere(rootDirPath: path.Pathlike, matcher: (path: path.Pathlike) -> boolean?): { path.Path }
 	assert(fs.type(rootDirPath) == "dir", "rootDirPath must be a directory")
 
-	local descendants: { path.path } = {}
+	local descendants: { path.Path } = {}
 
-	local function search(rootPath: path.pathlike)
+	local function search(rootPath: path.Pathlike)
 		local isMatch = matcher(rootPath)
 		if isMatch == nil then
 			return
@@ -15,7 +15,7 @@ local function findWhere(rootDirPath: path.pathlike, matcher: (path: path.pathli
 		end
 
 		if fs.type(rootPath) == "dir" then
-			for _, child in fs.listdirectory(rootPath) do
+			for _, child in fs.listDirectory(rootPath) do
 				search(path.join(rootPath, child.name))
 			end
 		end

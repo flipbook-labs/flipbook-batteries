@@ -3,7 +3,7 @@ local process = require("@std/process")
 local richterm = require("@root/batteries/richterm")
 
 type Options = {
-	cwd: path.pathlike?,
+	cwd: path.Pathlike?,
 	env: { [string]: string }?,
 	captureOutput: boolean?,
 
@@ -15,7 +15,7 @@ type Options = {
 	By default this function will return nil, but in the case where you want to
 	capture stdout for parsing you can set `captureOutput = true`.
 --]]
-local function run(program: string, params: { string | number | boolean | path.pathlike }, options: Options?): string?
+local function run(program: string, params: { string | number | boolean | path.Pathlike }, options: Options?): string?
 	local stringParams: { string } = {}
 	for _, param in params do
 		table.insert(stringParams, tostring(param))

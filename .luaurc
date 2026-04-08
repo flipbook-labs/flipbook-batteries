@@ -4,6 +4,7 @@
     "lint": "~/.lute/typedefs/0.1.0/lint",
     "std": "~/.lute/typedefs/0.1.0/std",
     "lute": "~/.lute/typedefs/0.1.0/lute",
+    "batteries": "./Packages/lute/batteries",
     "repo": ".",
     "root": "./src",
     "scripts": "./scripts"

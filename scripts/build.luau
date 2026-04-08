@@ -26,11 +26,11 @@ local PROJECT_BUILD_PATH = `{project.BUILD_PATH}/{PROJECT_NAME}`
 
 local elapsed = stopwatch(function()
 	log.info(`building project to {PROJECT_BUILD_PATH}...`)
-	fs.removedirectory(PROJECT_BUILD_PATH, {
+	fs.removeDirectory(PROJECT_BUILD_PATH, {
 		recursive = true,
 	})
-	fs.createdirectory(PROJECT_BUILD_PATH, {
-		makeparents = true,
+	fs.createDirectory(PROJECT_BUILD_PATH, {
+		makeParents = true,
 	})
 
 	log.info(`copying source files...`)

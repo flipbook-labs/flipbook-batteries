@@ -1,13 +1,13 @@
 local fs = require("@std/fs")
 local path = require("@std/path")
 
-local function copyInto(src: path.pathlike, dest: path.pathlike)
+local function copyInto(src: path.Pathlike, dest: path.Pathlike)
 	if fs.type(src) == "dir" then
-		fs.createdirectory(dest, {
-			makeparents = true,
+		fs.createDirectory(dest, {
+			makeParents = true,
 		})
 
-		for _, file in fs.listdirectory(src) do
+		for _, file in fs.listDirectory(src) do
 			local filePath = path.join(src, file.name)
 			local fileDest = path.join(dest, file.name)
 
