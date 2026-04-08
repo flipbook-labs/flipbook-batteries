@@ -3,3 +3,5 @@
 
 # Third-party libraries
 /pkg
+/Packages
+loom.lock.luau
