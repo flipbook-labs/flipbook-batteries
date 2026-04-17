@@ -1,10 +1,10 @@
 return {
 	package = {
 		name = "FlipbookBatteries",
-		version = "0.8.0",
+		version = "0.9.0",
 		dependencies = {
-			["lute"] = {
-				rev = "0.1.0-nightly.20260408",
+			Lute = {
+				rev = "v1.0.0",
 				sourceKind = "github",
 				source = "https://github.com/luau-lang/lute",
 			},
