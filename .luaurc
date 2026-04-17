@@ -1,12 +1,12 @@
 {
   "languageMode": "strict",
   "aliases": {
-    "lint": "~/.lute/typedefs/0.1.0/lint",
-    "std": "~/.lute/typedefs/0.1.0/std",
-    "lute": "~/.lute/typedefs/0.1.0/lute",
-    "batteries": "./Packages/lute/batteries",
+    "lint": "~/.lute/typedefs/1.0.0/lint",
+    "std": "~/.lute/typedefs/1.0.0/std",
+    "lute": "~/.lute/typedefs/1.0.0/lute",
+    "batteries": "./Packages/Lute@v1.0.0/batteries",
     "repo": ".",
     "root": "./src",
-    "scripts": "./scripts"
+    "scripts": "./.lute"
   }
 }

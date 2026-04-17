@@ -48,8 +48,8 @@ local elapsed = stopwatch(function()
 		run("luau-lsp", {
 			"analyze",
 			"--settings=./.vscode/settings.json",
-			"src",
-			"scripts",
+			project.SOURCE_PATH,
+			project.SCRIPTS_PATH,
 		}, {
 			display = true,
 		})
