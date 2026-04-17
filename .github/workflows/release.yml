@@ -24,7 +24,7 @@ jobs:
           version: v1.2.0
 
       - name: Build
-        run: lute scripts/build.luau
+        run: lute run build
 
       - uses: actions/upload-artifact@v4
         with:
