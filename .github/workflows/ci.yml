@@ -43,6 +43,7 @@ jobs:
         run: lute setup
 
       - name: List out certs
+        continue-on-error: true
         run: ls -al /etc/pki/tls/certs/
 
       - name: Install dependencies
