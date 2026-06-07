@@ -11,134 +11,17 @@ on:
         default: false
 
 jobs:
-  gate:
-    if: |
-      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
-      github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    outputs:
-      has_changes: ${{ steps.eval.outputs.has_changes }}
-      should_publish: ${{ steps.eval.outputs.should_publish }}
-      version: ${{ steps.eval.outputs.version }}
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Evaluate release action
-        id: eval
-        run: |
-          set -euo pipefail
-
-          version="$(grep -m1 'version = "' loom.config.luau | sed 's/.*version = "\([^"]*\)".*/\1/')"
-          if [ -z "$version" ]; then
-            echo "Could not read package version from loom.config.luau" >&2
-            exit 1
-          fi
-
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_publish }}" = "true" ]; then
-            echo "should_publish=true" >> "$GITHUB_OUTPUT"
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-            echo "version=$version" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # The version in loom.config.luau is the source of truth. If it
-          # has no matching tag yet, a publish PR was just merged (the bump
-          # landed but nothing has been released) so we publish it. This is
-          # state-based and does not depend on the merge commit's message.
-          if ! git rev-parse -q --verify "refs/tags/v${version}" >/dev/null; then
-            echo "should_publish=true" >> "$GITHUB_OUTPUT"
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-            echo "version=$version" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-
-          # The current version is already released. Surface whether there
-          # are commits since its tag so a new publish PR can be prepared.
-          commit_count="$(git rev-list --count "v${version}..HEAD")"
-          if [ "$commit_count" -gt 0 ]; then
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-          fi
-          echo "should_publish=false" >> "$GITHUB_OUTPUT"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
-
-  publish-release:
-    needs: gate
-    if: needs.gate.outputs.should_publish == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+  release:
+    uses: ./.github/workflows/reusable-release.yml
     permissions:
       contents: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Locate publish commit
-        id: commit
-        run: |
-          set -euo pipefail
-          version="${{ needs.gate.outputs.version }}"
-
-          # The publish commit is the one that set this version in
-          # loom.config.luau, so pickaxe for that exact line rather than tagging
-          # whichever commit happened to trip the gate. The gate only ever
-          # publishes the current (latest) version, whose line hasn't been
-          # changed away yet, so the newest match is the commit that set it.
-          sha="$(git log -1 --format=%H -S"version = \"${version}\"" -- loom.config.luau)"
-          if [ -z "$sha" ]; then
-            echo "Could not find the commit that set version ${version}" >&2
-            exit 1
-          fi
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
-
-      - name: Create and push publish tag
-        run: |
-          set -euo pipefail
-          tag="v${{ needs.gate.outputs.version }}"
-
-          if git ls-remote --exit-code origin "refs/tags/${tag}"; then
-            echo "Tag ${tag} already exists on origin"
-            exit 0
-          fi
-
-          git tag "${tag}" "${{ steps.commit.outputs.sha }}"
-          git push origin "${tag}"
-
-      # Generate notes for just this release. `--latest` restricts git-cliff to
-      # the newest tag (the one we just pushed) and `--strip header` drops the
-      # changelog preamble, so the output is only the current release's section.
-      - name: Generate release notes
-        uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.toml
-          args: --latest --strip header
-        env:
-          OUTPUT: release-notes.md
-          GITHUB_REPO: ${{ github.repository }}
-
-      - name: Create draft GitHub release
-        run: |
-          set -euo pipefail
-          tag="v${{ needs.gate.outputs.version }}"
-          if gh release view "$tag"; then
-            echo "Draft release $tag already exists"
-            exit 0
-          fi
-          gh release create "$tag" \
-            --draft \
-            --title "$tag" \
-            --target "${{ steps.commit.outputs.sha }}" \
-            --notes-file release-notes.md
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      pull-requests: write
+    secrets: inherit
+    with:
+      force_publish: ${{ inputs.force_publish == true }}
 
   build:
-    needs: [gate, publish-release]
+    needs: release
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -162,12 +45,12 @@ jobs:
           name: flipbook-batteries
 
       - name: Attach archive to draft release
-        if: needs.publish-release.result == 'success'
+        if: needs.release.outputs.should_publish == 'true'
         shell: bash
         run: |
           set -euo pipefail
 
-          tag="v${{ needs.gate.outputs.version }}"
+          tag="${{ needs.release.outputs.tag }}"
 
           is_draft="$(gh release view "$tag" --json isDraft -q '.isDraft' || echo false)"
           if [ "$is_draft" != "true" ]; then
@@ -178,80 +61,3 @@ jobs:
           gh release upload "$tag" "${BUILD_ARTIFACT_PATH}" --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  prepare-release-pr:
-    needs: [gate, publish-release]
-    if: |
-      always() &&
-      needs.gate.result == 'success' &&
-      (
-        (needs.gate.outputs.has_changes == 'true' && needs.gate.outputs.should_publish != 'true') ||
-        (needs.gate.outputs.should_publish == 'true' && needs.publish-release.result == 'success')
-      )
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: write
-      pull-requests: write
-    concurrency:
-      group: release-pr-${{ github.ref }}
-      cancel-in-progress: true
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: CompeyDev/setup-rokit@v0.2.1
-        with:
-          version: v1.2.0
-
-      - name: Install dependencies
-        run: lute pkg install
-
-      - name: Determine next version
-        id: version
-        run: |
-          set -euo pipefail
-          version="${{ needs.gate.outputs.version }}"
-          if git rev-parse "v${version}"; then
-            IFS=. read -r major minor patch <<< "$version"
-            next_version="$major.$((minor + 1)).0"
-          else
-            next_version="$version"
-          fi
-          echo "next_version=$next_version" >> "$GITHUB_OUTPUT"
-
-      - name: Bump package version
-        run: lute run bump-version --version "${{ steps.version.outputs.next_version }}"
-
-      - uses: orhun/git-cliff-action@v4
-        with:
-          config: cliff.toml
-          args: --tag v${{ steps.version.outputs.next_version }}
-        env:
-          OUTPUT: CHANGELOG.md
-          GITHUB_REPO: ${{ github.repository }}
-
-      - name: Create or update publish PR
-        uses: peter-evans/create-pull-request@v7
-        with:
-          base: main
-          branch: publish-next-version
-          title: "[AUTO-GENERATED] Publish v${{ steps.version.outputs.next_version }}"
-          commit-message: "Publish v${{ steps.version.outputs.next_version }}"
-          body: |
-            This PR prepares the next release by bumping the version and updating the changelog.
-
-            Merging this PR will:
-
-            1. Create and push tag `v${{ steps.version.outputs.next_version }}`
-            2. Create a draft GitHub release for that tag
-            3. Build flipbook-batteries and attach the archive to the draft release
-
-            Next release will be available here:
-            ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.next_version }}
-
-            🤖 This PR was generated by [this action run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
-          add-paths: |
-            CHANGELOG.md
-            loom.config.luau
