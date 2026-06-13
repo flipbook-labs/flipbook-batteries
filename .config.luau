@@ -12,7 +12,7 @@ return {
 
 			-- Remove this alias once we don't have to write such unwieldy paths
 			-- to our batteries
-			batteries = "~/.loom/store/Lute@v1.0.1-nightly.20260508/batteries",
+			batteries = "~/.loom/store/Lute@v1.0.1-nightly.20260612/batteries",
 		},
 	},
 }
