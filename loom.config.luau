@@ -4,7 +4,7 @@ return {
 		version = "0.10.1",
 		dependencies = {
 			Lute = {
-				rev = "v1.0.1-nightly.20260508",
+				rev = "v1.0.1-nightly.20260612",
 				sourceKind = "github",
 				source = "https://github.com/luau-lang/lute",
 			},
