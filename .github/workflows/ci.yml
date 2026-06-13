@@ -63,3 +63,22 @@ jobs:
 
       - name: Run tests
         run: lute test src/
+
+  smoketest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: CompeyDev/setup-rokit@v0.1.2
+        with:
+          version: v1.2.0
+
+      - name: Setup Lute typedefs
+        run: lute setup
+
+      - name: Install dependencies
+        run: lute pkg install
+
+      - name: Run smoketest
+        run: lute run smoketest
