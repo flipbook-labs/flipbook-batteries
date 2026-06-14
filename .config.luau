@@ -7,7 +7,7 @@ return {
 			lute = "~/.lute/typedefs/1.0.1/lute",
 			pkg = "~/.loom/store",
 			repo = ".",
-			root = "src",
+			root = "./src",
 			scripts = ".lute",
 
 			-- Remove this alias once we don't have to write such unwieldy paths
