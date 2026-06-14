@@ -1,7 +1,7 @@
 return {
 	package = {
 		name = "FlipbookBatteries",
-		version = "0.11.0",
+		version = "0.11.1",
 		dependencies = {
 			Lute = {
 				rev = "v1.0.1-nightly.20260612",
