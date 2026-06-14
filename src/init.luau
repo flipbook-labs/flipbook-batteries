@@ -18,4 +18,7 @@ return {
 
 	-- Benchmarking
 	stopwatch = require("@self/stopwatch"),
+
+	-- CLI
+	cli = require("@self/cli"),
 }
