@@ -1,5 +1,5 @@
 [version]
-current = "0.11.1"
+current = "0.12.0"
 mirror = [
   { file = "loom.config.luau" },
 ]
