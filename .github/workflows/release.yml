@@ -3,12 +3,21 @@ name: Release
 on:
   push:
     branches: [main]
+  pull_request:
+    types: [
+        opened,
+        synchronize,
+        reopened,
+        # We include `labeled` so that tagging the PR with `debug:release-pr`
+        # will trigger a debug version of the release workflow.
+        labeled,
+      ]
   workflow_dispatch:
     inputs:
-      force_publish:
-        description: Tag and create a release from the configured version on main
-        type: boolean
-        default: false
+      force-version:
+        description: "Open a publish PR that sets this exact version (e.g. 1.2.3)"
+        default: ""
+        required: false
 
 permissions:
   contents: write
@@ -16,9 +25,20 @@ permissions:
 
 jobs:
   release:
+    if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'debug:release-pr')
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    concurrency:
+      group: release-pr-${{ github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     steps:
+      - name: Generate app token
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.FLIPBOOK_BACKEND_APP_ID }}
+          private-key: ${{ secrets.FLIPBOOK_BACKEND_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -34,12 +54,14 @@ jobs:
         uses: flipbook-labs/changewrite@v0.5.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          force-publish: ${{ inputs.force_publish || false }}
+          pr-token: ${{ steps.app-token.outputs.token }}
+          force-version: ${{ inputs.force-version || '' }}
           base: main
-          branch: publish-next-version
+          branch: ${{ github.event_name == 'pull_request' && 'debug-publish-next-version' || 'publish-next-version' }}
+          prepare-only: ${{ github.event_name == 'pull_request' }}
           post-draft-hook: |
             "$CHANGEWRITE_BIN" attach --tag "$CHANGEWRITE_TAG" --files build/flipbook-batteries.zip
-          pr-title: Publish v{{version}}
+          pr-title: ${{ github.event_name == 'pull_request' && '[DEBUG] Publish v{{version}}' || 'Publish v{{version}}' }}
           pr-body: |
             >[!IMPORTANT]
             > This PR prepares the next release by bumping the version and updating the changelog.
