@@ -7,12 +7,13 @@ local run = require("@root/run")
 local CONFIG_PATH = ".config.luau"
 local LOCKFILE_PATH = "pkg.lock.luau"
 
--- `lute pkg install` puts each dependency in the Loom store under a folder
--- named by a hash of its source and rev. The lockfile records that folder, but
--- `lute check` and editors read aliases only from `.config.luau`. So after
--- installing, this writes each dependency's folder into the alias for it.
--- Keys are aliases in `.config.luau`, and values are dependency names in
--- `pkg.luau`.
+-- `lute pkg install` puts each dependency in the Loom store, `~/.loom/store`,
+-- under a folder whose name includes hashes of its source and rev. A dependency
+-- with a `target` in `pkg.luau` installs only that subfolder, like Lute's
+-- `batteries`. The lockfile records where each one landed, but `lute check` and
+-- editors read aliases only from `.config.luau`. So after installing, this
+-- copies each recorded path into that dependency's alias. Keys are aliases in
+-- `.config.luau`, and values are dependency names in `pkg.luau`.
 local DEPENDENCY_ALIASES: { [string]: string } = {
 	batteries = "Lute",
 }
@@ -27,8 +28,8 @@ local function getStorePath(lockfile: Lockfile, name: string): string
 	local key = lockfile.dependencies[name] or (lockfile.devDependencies and lockfile.devDependencies[name])
 	assert(key, `{name} is not a dependency in {LOCKFILE_PATH}`)
 
-	-- The lockfile writes `@pkg/` for the store, and an installPath without a
-	-- target ends in `/.`.
+	-- The lockfile writes `@pkg/` for the store, and the path of a dependency
+	-- without a target ends in `/.`.
 	local installPath = lockfile.packages[key].installPath
 	return (installPath:gsub("^@pkg/", "~/.loom/store/"):gsub("/%.$", ""))
 end
