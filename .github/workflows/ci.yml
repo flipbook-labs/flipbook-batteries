@@ -20,13 +20,13 @@ jobs:
           # exist. Full history guarantees it (the default depth-1 checkout does not).
           fetch-depth: 0
 
-      - uses: flipbook-labs/changewrite@v0.7.0
+      - uses: flipbook-labs/changewrite@v0.12.0
         with:
           require-entry: 'true'
 
       # Clear the publish-lock status on this PR's head so a required check can pass.
       # The publish PR gets its lock managed by the release workflow instead.
-      - uses: flipbook-labs/changewrite/publish-lock@v0.7.0
+      - uses: flipbook-labs/changewrite/publish-lock@v0.12.0
         if: github.head_ref != 'publish-next-version'
         with:
           locked: false
@@ -47,7 +47,7 @@ jobs:
         run: lute setup
 
       - name: Install dependencies
-        run: lute pkg install
+        run: lute run install
 
       - name: Build the project
         run: lute run build
@@ -69,7 +69,7 @@ jobs:
         run: lute setup
 
       - name: Install dependencies
-        run: lute pkg install
+        run: lute run install
 
       - name: Run analysis
         run: lute run analyze
@@ -85,7 +85,7 @@ jobs:
           version: v1.2.0
 
       - name: Install dependencies
-        run: lute pkg install
+        run: lute run install
 
       - name: Run tests
         run: lute test src/
@@ -104,7 +104,7 @@ jobs:
         run: lute setup
 
       - name: Install dependencies
-        run: lute pkg install
+        run: lute run install
 
       - name: Run smoketest
         run: lute run smoketest
