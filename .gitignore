@@ -4,5 +4,4 @@
 # Third-party libraries
 /pkg
 /Packages
-/LuauPackages
 pkg.lock.luau
