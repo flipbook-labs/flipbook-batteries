@@ -4,4 +4,4 @@ category: Internal
 kind: contributing
 ---
 
-Agents find the shared skills library through the `agent-skills` alias in `.config.luau`, which `lute run install` writes from the lockfile.
+`lute run install` writes an alias in `.config.luau` for every dependency, named after its lowercase kebab-case key in `pkg.luau`. Agents find the shared skills library through the `agent-skills` alias.
