@@ -8,9 +8,8 @@ local stopwatch = require("@root/stopwatch")
 
 -- flipbook-batteries is a library, so its own build never bundles it into an
 -- executable with `lute compile`. Downstream projects do. A require can resolve
--- under `lute run` and in luau-lsp analysis yet fail inside a bundle: an alias
--- once written as `src` instead of `./src` aborted every consumer's bundle with
--- `could not jump to alias "src"`.
+-- under `lute run` and in luau-lsp analysis yet fail inside a bundle, because
+-- the bundler resolves paths and aliases on its own.
 --
 -- This smoketest compiles a tiny entry that requires `src/init.luau`, which
 -- loads every module, into a real bundle and runs it. If any require in
