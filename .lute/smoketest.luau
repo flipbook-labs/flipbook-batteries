@@ -20,7 +20,7 @@ local ENTRY_PATH = `{project.BUILD_PATH}/smoketest-entry.luau`
 local OUTPUT_PATH = `{project.BUILD_PATH}/smoketest`
 
 local ENTRY_SOURCE = [[
-local _ = require("@root")
+require("@root")
 print("flipbook-batteries bundle loaded")
 ]]
 
