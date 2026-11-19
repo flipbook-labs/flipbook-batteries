@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 
 
+## v0.13.1
+
+Changes 1
+
+### Changes
+
+1. <picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-dark.svg"><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-light.svg"><img src="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-light.png" alt="Packages" height="18" align="texttop"></picture> Install flipbook-batteries with `lute pkg install --vendor` (Lute 1.0.1-nightly.20261117 or newer) and define `lpm = "./.lpm"` in your `.config.luau`. ([#31](https://github.com/flipbook-labs/flipbook-batteries/pull/31))
+
+
 ## v0.13.0
 
 Changes 3 · Dependencies 1 · Internal 2
