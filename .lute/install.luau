@@ -5,7 +5,7 @@ local process = require("@std/process")
 -- `.lpm`. When a vendored package requires through `@lpm`, the require uses
 -- the `lpm` alias of whichever project vendored it. So any project that
 -- vendors such a package has to define the same alias.
--- flipbook-labs/infra#43 tracks removing that requirement:
--- https://github.com/flipbook-labs/infra/issues/43
+-- flipbook-labs/flipbook#694 tracks removing that requirement:
+-- https://github.com/flipbook-labs/flipbook/issues/694
 local result = process.run({ "lute", "pkg", "install", "--vendor" }, { stdio = "inherit" })
 assert(result.ok, "lute pkg install failed")
