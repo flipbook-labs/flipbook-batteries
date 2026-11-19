@@ -2,6 +2,8 @@ return {
 	package = {
 		name = "FlipbookBatteries",
 		version = "0.13.0",
+		-- `src/.config.luau` is hidden, so it has to be named to ship.
+		files = { "/init.luau", "/src/**", "/src/.config.luau", "/README.md", "/LICENSE" },
 		dependencies = {
 			batteries = {
 				rev = "v1.0.1-nightly.20261115",
