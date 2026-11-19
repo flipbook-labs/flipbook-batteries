@@ -1,7 +1,7 @@
 ---
 bump: patch
-category: Internal
+category: Changes
 kind: packages
 ---
 
-`lute run install` writes an alias in `.config.luau` for every dependency, named after its lowercase kebab-case key in `pkg.luau`. The package now ships its own `root` alias in `src/.config.luau` and lists its files in `pkg.luau`, so a vendored copy resolves `@root` without the repo's store aliases.
+Install flipbook-batteries with `lute pkg install --vendor` (Lute 1.0.1-nightly.20261117 or newer) and define `lpm = "./.lpm"` in your `.config.luau`.

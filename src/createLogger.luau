@@ -1,6 +1,6 @@
 local process = require("@std/process")
 
-local richterm = require("@root/batteries/richterm")
+local richterm = require("./batteries/richterm")
 
 type LogLevel = "info" | "warn" | "err" | "debug"
 

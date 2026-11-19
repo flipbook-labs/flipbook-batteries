@@ -1,6 +1,6 @@
 local path = require("@std/path")
 local process = require("@std/process")
-local richterm = require("@root/batteries/richterm")
+local richterm = require("./batteries/richterm")
 
 type Options = {
 	cwd: path.Pathlike?,

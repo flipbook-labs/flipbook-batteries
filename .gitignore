@@ -5,3 +5,6 @@
 /pkg
 /Packages
 pkg.lock.luau
+
+# Dependencies vendored by `lute run install`
+/.lpm/

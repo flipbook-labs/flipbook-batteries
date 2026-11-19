@@ -6,26 +6,22 @@ local project = require("@repo/project")
 local run = require("@root/run")
 local stopwatch = require("@root/stopwatch")
 
--- flipbook-batteries is a library, so it is never bundled into an executable as
--- part of its own build. That leaves a blind spot: an alias can resolve fine in
--- non-bundled runs and in luau-lsp analysis yet still break every downstream
--- project that bundles the package via `lute compile`. This is exactly what
--- happened with the `@root` alias being written as `src` instead of `./src` --
--- the bundler reads a value without a leading `./` as another alias name and
--- aborts with `could not jump to alias "src"`, but only inside a consumer's
--- bundle.
+-- flipbook-batteries is a library, so its own build never bundles it into an
+-- executable with `lute compile`. Downstream projects do. A require can resolve
+-- under `lute run` and in luau-lsp analysis yet fail inside a bundle: an alias
+-- once written as `src` instead of `./src` aborted every consumer's bundle with
+-- `could not jump to alias "src"`.
 --
--- This smoketest closes the gap: it compiles a tiny entry that requires a
--- battery through `@root` into a real bundle and runs it. If the bundled
--- aliases are broken, the executable aborts on require and we surface it here.
+-- This smoketest compiles a tiny entry that requires `src/init.luau`, which
+-- loads every module, into a real bundle and runs it. If any require in
+-- the package doesn't resolve when bundled, the executable aborts and this
+-- script fails.
 
 local ENTRY_PATH = `{project.BUILD_PATH}/smoketest-entry.luau`
 local OUTPUT_PATH = `{project.BUILD_PATH}/smoketest`
 
--- Requiring `run` pulls in `@root/batteries/richterm`, exercising the `@root`
--- alias the same way a downstream consumer's bundle does.
 local ENTRY_SOURCE = [[
-local _ = require("@root/run")
+local _ = require("@root")
 print("flipbook-batteries bundle loaded")
 ]]
 

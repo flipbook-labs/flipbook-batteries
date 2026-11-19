@@ -9,7 +9,6 @@ local stopwatch = require("@root/stopwatch")
 
 local INCLUDED_PATHS = {
 	"src/",
-	".config.luau",
 	"init.luau",
 	"LICENSE",
 	"README.md",
