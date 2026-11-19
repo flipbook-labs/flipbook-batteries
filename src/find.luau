@@ -1,6 +1,6 @@
 local path = require("@std/path")
 
-local findWhere = require("./findWhere")
+local findWhere = require("@root/findWhere")
 
 local function find(root: path.Pathlike, filenamePattern: string): { path.Path }
 	return findWhere(root, function(filePath)

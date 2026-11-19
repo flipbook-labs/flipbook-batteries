@@ -2,8 +2,8 @@ local fs = require("@std/fs")
 local path = require("@std/path")
 local task = require("@lute/task")
 
-local getDescendants = require("./getDescendants")
-local richterm = require("./batteries/richterm")
+local getDescendants = require("@root/getDescendants")
+local richterm = require("@root/batteries/richterm")
 
 type Options = {
 	roots: { path.Pathlike },
