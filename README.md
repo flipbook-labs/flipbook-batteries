@@ -41,10 +41,10 @@ run("stylua", { "--check", "src" })
 - `findWhere(root, matcher)`: returns the paths under `root` for which `matcher` returns `true`. If `matcher` returns `nil`, that path and everything beneath it are skipped.
 - `findAndReplace(filePath, match, replacement)`: replaces every match of a Lua pattern in a file and writes the file back.
 - `getDescendants(dirPath)`: returns every file and folder under `dirPath`, or an empty list if it is not a folder.
-- `copyInto(src, dest)`: copies a file, or the contents of a folder, into `dest`. Missing folders are created.
+- `copyInto(src, dest)`: copies a file to `dest`, or a folder's contents into `dest`. A folder copy creates any missing folders, but a file copy needs `dest`'s parent folder to exist.
 - `watch({ roots, excludedFilePatterns?, onChanged? })`: watches the folders inside each root and calls `onChanged` with the watched folder that changed. It runs until the script stops.
 - `stopwatch(callback)`: runs `callback` and returns how long it took, in milliseconds, rounded to three decimal places.
-- `mkdir` and `rmdir`: deprecated. Use `createDirectory` and `removeDirectory` from Lute's `@std/fs` instead.
+- `mkdir` and `rmdir`: deprecated. Use `createDirectory(dirPath, { makeParents = true })` and `removeDirectory(dirPath, { recursive = true })` from Lute's `@std/fs` instead.
 
 ## Contributing
 
