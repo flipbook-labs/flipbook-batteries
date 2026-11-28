@@ -19,7 +19,6 @@ local EXCLUDED_PATHS = {
 }
 
 local PROJECT_NAME = "flipbook-batteries"
-local ARCHIVE_NAME = `{PROJECT_NAME}.zip`
 
 local PROJECT_BUILD_PATH = `{project.BUILD_PATH}/{PROJECT_NAME}`
 
@@ -50,11 +49,6 @@ local elapsed = stopwatch(function()
 			fs.remove(match)
 		end
 	end
-
-	run("zip", { "-r", ARCHIVE_NAME, PROJECT_NAME }, {
-		cwd = project.BUILD_PATH,
-		display = true,
-	})
 end)
 
 log.info(`successfully built flipbook-batteries in {elapsed}ms`)

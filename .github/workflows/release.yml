@@ -59,13 +59,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: CompeyDev/setup-rokit@v0.1.2
-        with:
-          version: v1.2.0
-
-      - name: Build
-        run: lute run build
-
       - id: changewrite
         uses: flipbook-labs/changewrite@v0.16.0
         with:
@@ -75,8 +68,6 @@ jobs:
           base: main
           branch: ${{ github.event_name == 'pull_request' && 'debug-publish-next-version' || 'publish-next-version' }}
           prepare-only: ${{ github.event_name == 'pull_request' }}
-          post-draft-hook: |
-            "$CHANGEWRITE_BIN" attach --tag "$CHANGEWRITE_TAG" --files build/flipbook-batteries.zip
           pr-title: ${{ github.event_name == 'pull_request' && '[DEBUG] Publish v{{version}}' || 'Publish v{{version}}' }}
           pr-body: |
             >[!IMPORTANT]
@@ -86,7 +77,6 @@ jobs:
             >
             > 1. Create and push tag `{{tag}}`
             > 2. Create a GitHub release for that tag
-            > 3. Attach the standalone `flipbook-batteries.zip` build to the release
 
             <details>
             <summary><b>GitHub Release preview</b></summary>
