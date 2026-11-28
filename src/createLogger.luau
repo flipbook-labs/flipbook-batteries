@@ -1,76 +1,54 @@
-local process = require("@std/process")
+--!strict
+--[[
+	Creates a named, leveled logger on top of Archivist
+	(https://github.com/flipbook-labs/archivist), flipbook-labs' logging
+	library. It returns a small API: `info`, `debug`, `warn`, and `err`, called
+	as `logger.info(...)`, plus `getLogLevel`. Code that needs more, such as
+	sinks, structured fields, or child loggers, can depend on Archivist
+	directly.
 
-local richterm = require("@root/batteries/richterm")
+	Archivist reads the starting level from the LOG_LEVEL environment variable
+	when the logger is created, and falls back to info.
+]]
 
-type LogLevel = "info" | "warn" | "err" | "debug"
+local Archivist = require("@lpm/archivist@v0.3.1")
 
-local LOG_LEVEL_ORDER = {
-	"err",
-	"info",
-	"warn",
-	"debug",
-}
+type LogLevel = "trace" | "debug" | "info" | "warn" | "err"
 
 type Logger = {
 	getLogLevel: () -> LogLevel,
-	info: (...any) -> (),
-	debug: (...any) -> (),
-	warn: (...any) -> (),
-	err: (...any) -> (),
+	info: (...unknown) -> (),
+	debug: (...unknown) -> (),
+	warn: (...unknown) -> (),
+	err: (...unknown) -> (),
+}
+
+-- Archivist names its levels in PascalCase, and `getLogLevel` reports them in
+-- lowercase. Archivist also has a trace level, which LOG_LEVEL=trace selects.
+-- This logger has no `trace` function, but `getLogLevel` still reports it.
+local LEVEL_NAMES: { [string]: LogLevel } = {
+	Trace = "trace",
+	Debug = "debug",
+	Info = "info",
+	Warn = "warn",
+	Err = "err",
 }
 
 local function createLogger(name: string): Logger
-	local function getLogLevel(): LogLevel
-		local logLevel = process.env.LOG_LEVEL
-		if logLevel and logLevel ~= "" then
-			return logLevel:lower() :: LogLevel
-		else
-			return "info"
-		end
-	end
-
-	local function canLog(logLevelToCheck: LogLevel): boolean
-		local maxPriority = table.find(LOG_LEVEL_ORDER, getLogLevel())
-		local priorityToCheck = table.find(LOG_LEVEL_ORDER, logLevelToCheck)
-
-		if maxPriority and priorityToCheck then
-			return priorityToCheck <= maxPriority
-		else
-			return false
-		end
-	end
-
-	local function info(...)
-		if canLog("info") then
-			local prefix = richterm.blue(`[{name}] [info]`)
-			print(`{prefix} {...}`)
-		end
-	end
-
-	local function warn(...)
-		if canLog("warn") then
-			print(richterm.yellow(`[{name}] [warn] {...}`))
-		end
-	end
-
-	local function err(...)
-		if canLog("err") then
-			print(richterm.red(`[{name}] [err] {...}`))
-		end
-	end
-
-	local function debug(...)
-		if canLog("debug") then
-			print(richterm.black(`[{name}] [debug] {...}`))
-		end
-	end
+	-- Archivist's console output is `[level] message` by default. The name
+	-- middleware adds the logger's name in front: `[name] [level] message`.
+	local logger = Archivist.createLogger(name, {
+		middleware = { Archivist.middleware.name },
+	})
 
 	return {
-		getLogLevel = getLogLevel,
-		info = info,
-		warn = warn,
-		err = err,
-		debug = debug,
+		getLogLevel = function(): LogLevel
+			return LEVEL_NAMES[logger.getLevel()]
+		end,
+		info = logger.info,
+		debug = logger.debug,
+		warn = logger.warn,
+		err = logger.err,
 	}
 end
 

@@ -34,7 +34,7 @@ run("stylua", { "--check", "src" })
 
 ## Modules
 
-- `createLogger(name)`: returns `info`, `warn`, `err`, and `debug` functions that print with a `[name]` prefix. The `LOG_LEVEL` environment variable sets how much prints, as `err`, `info`, `warn`, or `debug`. It defaults to `info`.
+- `createLogger(name)`: returns `debug`, `info`, `warn`, and `err` functions that print with a `[name]` prefix, built on [Archivist](https://github.com/flipbook-labs/archivist). The `LOG_LEVEL` environment variable sets the lowest level that prints, from `debug` up to `err`. It defaults to `info`, which prints info, warnings, and errors.
 - `dotenv()`: loads the `.env` file in the current directory into `process.env`. Only keys made of uppercase letters and underscores load.
 - `run(program, params, options?)`: runs a program with the given arguments and prints the command first. Set `captureOutput = true` to return its trimmed stdout. `options` also accepts `cwd` and `env`. The call errors if the program fails.
 - `find(root, filenamePattern)`: returns the paths under `root` whose file name matches a Lua pattern.
