@@ -43,6 +43,7 @@ run("stylua", { "--check", "src" })
 - `getDescendants(dirPath)`: returns every file and folder under `dirPath`, or an empty list if it is not a folder.
 - `copyInto(src, dest)`: copies a file to `dest`, or a folder's contents into `dest`. A folder copy creates any missing folders, but a file copy needs `dest`'s parent folder to exist.
 - `watch({ roots, excludedFilePatterns?, onChanged? })`: watches the folders inside each root and calls `onChanged` with the watched folder that changed. It runs until the script stops.
+- `overlayWallyPackage({ package, build, manifest, target })`: copies a development build of a Wally package, such as its `dist/` folder, over every copy of that package in another checkout's `Packages/_Index`. That includes copies the checkout only gets through another package. It then rewrites the Wally link files that point at those copies so their type re-exports match the build, adds links for dependencies the build gained, and prints what changed. It needs `rojo` and `wally-package-types` on the PATH. The checkout's next `wally install` undoes it.
 - `stopwatch(callback)`: runs `callback` and returns how long it took, in milliseconds, rounded to three decimal places.
 - `mkdir` and `rmdir`: deprecated. Use `createDirectory(dirPath, { makeParents = true })` and `removeDirectory(dirPath, { recursive = true })` from Lute's `@std/fs` instead.
 
