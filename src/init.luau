@@ -13,6 +13,9 @@ return {
 	rmdir = require("@self/rmdir"),
 	watch = require("@self/watch"),
 
+	-- Packages
+	overlayWallyPackage = require("@self/overlayWallyPackage"),
+
 	-- Logging
 	createLogger = require("@self/createLogger"),
 

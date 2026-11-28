@@ -6,5 +6,7 @@
 [tools]
 luau-lsp = "JohnnyMorganz/luau-lsp@1.68.1"
 lute = "luau-lang/lute@1.0.1-nightly.20261117"
+rojo = "rojo-rbx/rojo@7.7.0"
 selene = "Kampfkarren/selene@0.31.0"
 stylua = "JohnnyMorganz/StyLua@2.5.2"
+wally-package-types = "JohnnyMorganz/wally-package-types@1.6.2"
