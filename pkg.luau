@@ -1,7 +1,7 @@
 return {
 	package = {
 		name = "FlipbookBatteries",
-		version = "0.13.1",
+		version = "0.14.0",
 		files = {
 			"/init.luau",
 			"/src/**",

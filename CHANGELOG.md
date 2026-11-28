@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.14.0
+
+Features 1 · Changes 1 · Internal 2
+
+### Features
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-light.svg" /><img src="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-light.png" alt="Packages" height="18" align="texttop" /></picture> Add `overlayWallyPackage` to copy a development build over a Wally package wherever another checkout installs it. ([#38](https://github.com/flipbook-labs/flipbook-batteries/pull/38))
+
+### Changes
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-logging-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-logging-light.svg" /><img src="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-logging-light.png" alt="Logging" height="18" align="texttop" /></picture> Build `createLogger` on Archivist; levels now order debug < info < warn < err, so the default level shows warnings. ([#24](https://github.com/flipbook-labs/flipbook-batteries/pull/24))
+
+<details>
+<summary>Details</summary>
+
+Releases no longer attach `flipbook-batteries.zip`, since the package now depends on Archivist. Install it through `pkg.luau` instead.
+
+</details>
+
+### Internal
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-contributing-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-contributing-light.svg" /><img src="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-contributing-light.png" alt="Contributing" height="18" align="texttop" /></picture> Rewrite the README for package users and move development setup into CONTRIBUTING.md. ([#37](https://github.com/flipbook-labs/flipbook-batteries/pull/37))
+
+<picture><source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-dark.svg" /><source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-light.svg" /><img src="https://raw.githubusercontent.com/flipbook-labs/flipbook-batteries/main/.changes/assets/kind-packages-light.png" alt="Packages" height="18" align="texttop" /></picture> Move to Changewrite v0.16.0 and AgentSkills v0.9.0. ([#37](https://github.com/flipbook-labs/flipbook-batteries/pull/37))
 
 ## v0.13.1
 
