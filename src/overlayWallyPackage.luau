@@ -1,10 +1,10 @@
 local fs = require("@std/fs")
 local json = require("@std/json")
 local path = require("@std/path")
+local process = require("@std/process")
 local system = require("@std/system")
 
 local copyInto = require("@root/copyInto")
-local run = require("@root/run")
 
 export type Options = {
 	-- Wally name of the package, such as `flipbook-labs/module-loader`.
@@ -60,6 +60,18 @@ local function findInstallFolderNames(index: path.Path, wallyName: string): { st
 	return folderNames
 end
 
+-- Passes each argument to the program as is. The scratch folder lives in the
+-- system's temporary folder, whose path can contain spaces.
+local function runTool(args: { string })
+	print(`> {table.concat(args, " ")}`)
+	local result = process.run(args, {
+		stdio = "inherit",
+	})
+	if not result.ok then
+		error(`{args[1]} failed with exit code {result.exitcode}`)
+	end
+end
+
 local function readExportedTypes(link: path.Pathlike): { [string]: true }
 	local types = {}
 	if fs.exists(link) then
@@ -110,7 +122,7 @@ end
 ]]
 local function overlayWallyPackage(options: Options): Report
 	local _, packageName = parseWallyName(options.package)
-	local target = path.resolve(options.target)
+	local target = path.resolve(tostring(options.target))
 	local packagesRoot = path.join(target, "Packages")
 	local index = path.join(packagesRoot, "_Index")
 	local report: Report = {
@@ -128,13 +140,50 @@ local function overlayWallyPackage(options: Options): Report
 		error(`{target} doesn't install {options.package}, directly or through another package`)
 	end
 
+	if fs.type(options.build) ~= "dir" then
+		error(`the build folder {options.build} doesn't exist. Build the package first`)
+	end
+
+	--[[
+		Only the `[dependencies]` table matters. Wally doesn't install a
+		package's `[dev-dependencies]` for a checkout that depends on it. Each
+		entry there is an alias and a quoted `scope/name@version`.
+
+		Lute's TOML parser uses syntax that luau-lsp can't parse yet. Requiring
+		it here would fail analysis in every project that requires this
+		package, so this reads the table by line instead and errors on a line
+		it can't read.
+	]]
+	local dependencies: { [string]: string } = {}
+	local isInDependencies = false
+	for lineNumber, line in fs.readFileToString(options.manifest):split("\n") do
+		local content = line:gsub("#.*$", ""):match("^%s*(.-)%s*$") :: string
+		local section = content:match("^%[([^%]]+)%]$")
+		if section then
+			isInDependencies = section == "dependencies"
+		elseif isInDependencies and content ~= "" then
+			local alias, _, dependency = content:match("^([%w_%-]+)%s*=%s*([\"'])([^\"'@]+)@[^\"']*%2$")
+			if not alias or not dependency then
+				error(`could not read line {lineNumber} of {options.manifest} as a Wally dependency`)
+			end
+			parseWallyName(dependency)
+			dependencies[alias] = dependency
+		end
+	end
+
 	--[[
 		Each install folder holds the package in a `<name>` folder. The
 		package's Rojo project file maps its whole tree to the folder inside
 		that one where its code lives, so the first `$path` in the file names
 		it. Without a project file, the code is assumed to be in `dist`, where
 		the flipbook-labs packages keep it.
+
+		Each of those folders is deleted before the build is copied in, so a
+		`$path` that leads outside the package is refused. Everything above
+		and here is checked before the first file changes, so a bad argument
+		leaves the checkout as it was.
 	]]
+	local bundles: { path.Path } = {}
 	for _, folderName in installFolderNames do
 		local install = path.join(index, folderName, packageName)
 		local bundleDirName = "dist"
@@ -146,14 +195,22 @@ local function overlayWallyPackage(options: Options): Report
 			end
 		end
 
-		local bundle = path.join(install, bundleDirName)
+		local bundle = path.resolve(tostring(install), bundleDirName)
+		local relative = path.format(path.relative(install, bundle))
+		if relative == "" or relative == "." or relative:sub(1, 2) == ".." or path.isAbsolute(relative) then
+			error(`{projectFile} points outside its package, at {bundle}`)
+		end
+		table.insert(bundles, bundle)
+		table.insert(report.installs, install)
+	end
+
+	for _, bundle in bundles do
 		if fs.exists(bundle) then
 			fs.removeDirectory(bundle, {
 				recursive = true,
 			})
 		end
 		copyInto(options.build, bundle)
-		table.insert(report.installs, install)
 	end
 
 	--[[
@@ -195,20 +252,7 @@ local function overlayWallyPackage(options: Options): Report
 		end
 	end
 
-	-- Only the `[dependencies]` table matters. Wally doesn't install a
-	-- package's `[dev-dependencies]` for a checkout that depends on it.
-	local isInDependencies = false
-	for line in fs.readFileToString(options.manifest):gmatch("[^\r\n]+") do
-		local section = line:match("^%s*%[([^%]]+)%]")
-		if section then
-			isInDependencies = section == "dependencies"
-			continue
-		end
-		local alias, dependency = line:match('^%s*([%w_]+)%s*=%s*"([^"@]+)@')
-		if not (isInDependencies and alias and dependency) then
-			continue
-		end
-
+	for alias, dependency in dependencies do
 		local _, dependencyName = parseWallyName(dependency)
 		local dependencyFolderName = findInstallFolderNames(index, dependency)[1]
 		for _, folderName in installFolderNames do
@@ -270,8 +314,8 @@ local function overlayWallyPackage(options: Options): Report
 				},
 			})
 		)
-		run("rojo", { "sourcemap", projectFile, "--absolute", "-o", sourcemap })
-		run("wally-package-types", { "--sourcemap", sourcemap, scratchPackages })
+		runTool({ "rojo", "sourcemap", tostring(projectFile), "--absolute", "-o", tostring(sourcemap) })
+		runTool({ "wally-package-types", "--sourcemap", tostring(sourcemap), tostring(scratchPackages) })
 
 		for _, pending in pendingLinks do
 			local typesBefore = readExportedTypes(pending.link)
